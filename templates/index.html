@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disaster Prediction</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+        h2, h3 {
+            color: #333;
+        }
+        select, input, button {
+            padding: 10px;
+            margin: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .form-container {
+            background: white;
+            padding: 20px;
+            width: 50%;
+            margin: 20px auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .input-group {
+            display: flex;
+            justify-content: space-between;
+        }
+        .input-group input {
+            width: 48%;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Select Disaster Type</h2>
+    <select id="disaster_type">
+        <option value="earthquake">Earthquake</option>
+        <option value="flood">Flood</option>
+    </select>
+
+    <div id="earthquake-form" class="form-container">
+        <h3>Earthquake Prediction</h3>
+        <input type="text" id="latitude" placeholder="Latitude">
+        <input type="text" id="longitude" placeholder="Longitude">
+        <input type="text" id="depth" placeholder="Depth">
+        <input type="text" id="nst" placeholder="NST">
+        <input type="text" id="gap" placeholder="Gap">
+        <input type="text" id="dmin" placeholder="Dmin">
+        <input type="text" id="rms" placeholder="RMS">
+        <input type="text" id="magNst" placeholder="MagNst">
+    </div>
+
+    <div id="flood-form" class="form-container" style="display:none;">
+        <h3>Flood Prediction</h3>
+        <div class="input-group">
+            <input type="text" id="latitude" placeholder="Latitude">
+            <input type="text" id="longitude" placeholder="Longitude">
+        </div>
+        <div class="input-group">
+            <input type="text" id="rainfall" placeholder="Rainfall">
+            <input type="text" id="temperature" placeholder="Temperature">
+        </div>
+        <div class="input-group">
+            <input type="text" id="humidity" placeholder="Humidity">
+            <input type="text" id="river_discharge" placeholder="River Discharge">
+        </div>
+        <div class="input-group">
+            <input type="text" id="water_level" placeholder="Water Level">
+            <input type="text" id="elevation" placeholder="Elevation">
+        </div>
+        <div class="input-group">
+            <input type="text" id="land_cover" placeholder="Land Cover">
+            <input type="text" id="soil_type" placeholder="Soil Type">
+        </div>
+        <div class="input-group">
+            <input type="text" id="population_density" placeholder="Population Density">
+            <input type="text" id="infrastructure" placeholder="Infrastructure">
+        </div>
+        <input type="text" id="historical_floods" placeholder="Historical Floods">
+    </div>
+
+    <button id="predict">Predict</button>
+    <h3 id="result"></h3>
+
+    <script>
+        $(document).ready(function(){
+            $("#disaster_type").change(function(){
+                let type = $(this).val();
+                if(type === "earthquake") {
+                    $("#earthquake-form").show();
+                    $("#flood-form").hide();
+                } else {
+                    $("#earthquake-form").hide();
+                    $("#flood-form").show();
+                }
+            });
+
+            $("#predict").click(function(){
+                let disasterType = $("#disaster_type").val();
+                let formData = { "disaster_type": disasterType };
+
+                if (disasterType === "earthquake") {
+                    formData["latitude"] = $("#latitude").val();
+                    formData["longitude"] = $("#longitude").val();
+                    formData["depth"] = $("#depth").val();
+                    formData["nst"] = $("#nst").val();
+                    formData["gap"] = $("#gap").val();
+                    formData["dmin"] = $("#dmin").val();
+                    formData["rms"] = $("#rms").val();
+                    formData["magNst"] = $("#magNst").val();
+                } else {
+                    formData["latitude"] = $("#latitude").val();
+                    formData["longitude"] = $("#longitude").val();
+                    formData["rainfall"] = $("#rainfall").val();
+                    formData["temperature"] = $("#temperature").val();
+                    formData["humidity"] = $("#humidity").val();
+                    formData["river_discharge"] = $("#river_discharge").val();
+                    formData["water_level"] = $("#water_level").val();
+                    formData["elevation"] = $("#elevation").val();
+                    formData["land_cover"] = $("#land_cover").val();
+                    formData["soil_type"] = $("#soil_type").val();
+                    formData["population_density"] = $("#population_density").val();
+                    formData["infrastructure"] = $("#infrastructure").val();
+                    formData["historical_floods"] = $("#historical_floods").val();
+                }
+
+                $.post("/predict", formData, function(response){
+                    if(response.prediction) {
+                        $("#result").text(response.prediction);
+                    } else {
+                        $("#result").text("Error: " + response.error);
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
